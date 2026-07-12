@@ -54,11 +54,13 @@ describe("server environment config", () => {
     ["USER_MAX_SITES", "-1"],
     ["USER_MONTHLY_AUDIT_LIMIT", "0"],
   ])("rejects invalid %s values", (name, value) => {
-    expect(() => parseServerEnv({ [name]: value })).toThrow();
+    expect(() => parseServerEnv({ NODE_ENV: "test", [name]: value })).toThrow();
   });
 
   it("rejects an invalid squirrelscan API URL", () => {
-    expect(() => parseServerEnv({ SQUIRRELSCAN_API_URL: "not-a-url" })).toThrow();
+    expect(() =>
+      parseServerEnv({ NODE_ENV: "test", SQUIRRELSCAN_API_URL: "not-a-url" }),
+    ).toThrow();
   });
 
   it("rejects the default auth secret in production", () => {

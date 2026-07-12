@@ -43,19 +43,26 @@ const serverEnvSchema = z
   .object({
     NODE_ENV: runtimeEnvSchema,
     API_PORT: z.coerce.number().int().positive().default(8000),
+    AUDIT_MAX_PAGES: z.coerce.number().int().positive().default(20),
     AUTH_SECRET: optionalStringSchema,
     BETTER_AUTH_SECRET: optionalStringSchema,
     BETTER_AUTH_URL: z.string().trim().url().default(defaultBetterAuthUrl),
     CLIENT_ORIGINS: z.string().trim().min(1).default(defaultClientOrigins),
     DATABASE_URL: z.string().trim().min(1).default(defaultDatabaseUrl),
     ENABLE_TELEMETRY: booleanSchema.default(false),
+    EMAIL_FROM: z.string().trim().min(1).default("Cek SEO <onboarding@resend.dev>"),
     LOG_LEVEL: logLevelSchema,
     REDIS_URL: z.string().trim().min(1).default("redis://localhost:16379"),
+    RESEND_API_KEY: optionalStringSchema,
+    SQUIRRELSCAN_API_KEY: optionalStringSchema,
+    SQUIRRELSCAN_API_URL: z.string().trim().url().default("https://api.squirrelscan.com"),
     TELEMETRY_API_KEY: optionalStringSchema,
     TELEMETRY_API_KEY_HEADER: z.string().trim().min(1).default("authorization"),
     TELEMETRY_EXPORTER: telemetryExporterSchema,
     TELEMETRY_EXPORTER_OTLP_ENDPOINT: optionalStringSchema,
     TELEMETRY_SERVICE_NAMESPACE: optionalStringSchema,
+    USER_MAX_SITES: z.coerce.number().int().positive().default(5),
+    USER_MONTHLY_AUDIT_LIMIT: z.coerce.number().int().positive().default(2),
   })
   .superRefine((env, context) => {
     const betterAuthSecret = env.BETTER_AUTH_SECRET ?? env.AUTH_SECRET ?? defaultBetterAuthSecret;
@@ -116,6 +123,22 @@ export const betterAuthConfig = {
 export const databaseConfig = {
   url: env.DATABASE_URL,
 } as const;
+
+export const squirrelscanConfig = Object.freeze({
+  apiKey: env.SQUIRRELSCAN_API_KEY,
+  apiUrl: env.SQUIRRELSCAN_API_URL,
+} as const);
+
+export const emailConfig = Object.freeze({
+  from: env.EMAIL_FROM,
+  resendApiKey: env.RESEND_API_KEY,
+} as const);
+
+export const auditConfig = Object.freeze({
+  maxPages: env.AUDIT_MAX_PAGES,
+  userMaxSites: env.USER_MAX_SITES,
+  userMonthlyLimit: env.USER_MONTHLY_AUDIT_LIMIT,
+} as const);
 
 export const redisConfig = {
   url: env.REDIS_URL,
